@@ -44,8 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompareSchema.cs" />
     <Compile Include="GetSchema.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SaveSchema.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
