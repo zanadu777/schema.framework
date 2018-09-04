@@ -48,6 +48,7 @@
     <Compile Include="SchemaObjects\DbColumn.cs" />
     <Compile Include="SchemaObjects\DbForeignKey.cs" />
     <Compile Include="SchemaObjects\DbForeignKeyColumn.cs" />
+    <Compile Include="SchemaObjects\DbForiegnKey.cs" />
     <Compile Include="SchemaObjects\DbParameter.cs" />
     <Compile Include="SchemaObjects\DbPrimaryKey.cs" />
     <Compile Include="SchemaObjects\DbSchema.cs" />

@@ -19,11 +19,14 @@ namespace Schema.SqlServer
 		{
 			var dbObjects = new List<DbSchemaObject>();
 			var tables = GetTables(connectionInfo);
-
 			foreach (var dbObject in tables.Values)
 				dbObjects.Add(dbObject);
 
-			var schema = new DbSchema(dbObjects);
+		    var storedProcs = GetStoredProcedures(connectionInfo);
+		    foreach (var dbObject in storedProcs.Values)
+		        dbObjects.Add(dbObject);
+
+            var schema = new DbSchema(dbObjects);
 			return schema;
 		}
 
@@ -244,8 +247,6 @@ FROM
 		}
 
 		#endregion
-
-
 
 		 
 			public Dictionary<string, DbView> GetViews(DatabaseConnectionInfo connectionInfo)

@@ -56,6 +56,9 @@ namespace Schema.Common.SchemaObjects
 
         public List<DbColumn> PrimaryKeyColumns => Columns.Where(c => c.IsInPrimaryKey).ToList();
 
+        public List<DbForeignKey>ForeignKeyConstraints = new List<DbForeignKey>();
+        public List<DbForeignKey> ForeignKeyReferences = new List<DbForeignKey>();
+
         public bool HasPrimayKey => Columns.Any(c => c.IsInPrimaryKey);
 
         public DbPrimaryKey PrimaryKey { get; set; } = new DbPrimaryKey();

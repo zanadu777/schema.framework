@@ -8,11 +8,14 @@ namespace PsSchema
     [Cmdlet(VerbsCommon.Get, "Schema")]
     public class GetSchema : PSCmdlet
     {
+        private const string SchemaObject = "SchemaObject";
+        private const string Name = "Name";
+
         [Parameter]
         public string ConnectionString { get; set; }
 
         [Parameter]
-        [ValidateSet("FullSchema", "SchemaObjects")]
+        [ValidateSet("FullSchema", SchemaObject, Name, "Definition")]
         public string Output { get; set; } = "FullSchema";
         protected override void ProcessRecord()
         {
@@ -23,9 +26,16 @@ namespace PsSchema
 
             if (Output == "FullSchema")
                 WriteObject( schema);
-            else if (Output == "SchemaObjects")
+            else if (Output == SchemaObject)
                 foreach (var dbSchemaObject  in schema)
-                    WriteObject(schema);
-        }
+                    WriteObject(dbSchemaObject);
+            else if (Output == Name)
+                foreach (var dbSchemaObject in schema)
+                    WriteObject(dbSchemaObject.Name);
+            else if (Output == "Definition")
+                foreach (var dbSchemaObject in schema)
+                    WriteObject(dbSchemaObject.Definition);
+
+        } 
     }
 }

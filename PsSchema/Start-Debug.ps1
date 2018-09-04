@@ -17,6 +17,6 @@ $env:PSModulePath = (Resolve-Path .).Path + ";" + $env:PSModulePath
 Import-Module 'PsSchema' -Verbose
 
 # Happy debugging :-)
-$constring = "Data Source=192.168.1.12;Initial Catalog=SchemaTest;Persist Security Info=True;User ID=sa;Password=Iscandar2199"
-get-schema   -ConnectionString $constring  -Output SchemaObjects
+$constring = "Data Source=192.168.1.12;Initial Catalog=P;Persist Security Info=True;User ID=sa;Password=Iscandar2199"
+get-schema   -ConnectionString $constring  -Output Name
 
