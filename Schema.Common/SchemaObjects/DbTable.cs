@@ -13,16 +13,17 @@ namespace Schema.Common.SchemaObjects
     {
         public DbTable()
         {
-            SchemaObjectType = ESchemaObjectType.Table;
             Columns = new ObservableCollection<DbColumn>();
         }
+
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.Table;
         public ObservableCollection<DbColumn> Columns { get; set; }
 
         public DataTable ColumnDataTable()
         {
             DataTable dt = new DataTable();
-            dt.Columns.Add(new DataColumn("Name", typeof (string)));
-            dt.Columns.Add(new DataColumn("DataType", typeof (string)));
+            dt.Columns.Add(new DataColumn("Name", typeof(string)));
+            dt.Columns.Add(new DataColumn("DataType", typeof(string)));
             dt.Columns.Add(new DataColumn("Ordinal", typeof(int)));
             dt.Columns.Add(new DataColumn("MaxLength", typeof(int)));
             dt.Columns.Add(new DataColumn("IsIdentity", typeof(bool)));
@@ -34,7 +35,7 @@ namespace Schema.Common.SchemaObjects
 
             foreach (var column in Columns)
             {
-             var row = dt.NewRow();
+                var row = dt.NewRow();
 
                 row["Name"] = column.Name;
                 row["DataType"] = column.DataType;
@@ -45,13 +46,22 @@ namespace Schema.Common.SchemaObjects
                 row["IsInPrimaryKey"] = column.IsInPrimaryKey;
                 row["IsForeignKey"] = column.IsForeignKey;
                 row["IsReferencedPrimaryKey"] = column.IsReferencedPrimaryKey;
-                row["DisplayDataType"] = column.DisplayDataType ;
+                row["DisplayDataType"] = column.DisplayDataType;
                 dt.Rows.Add(row);
             }
             return dt;
         }
 
         public List<DbColumn> NonIdentityColumns => Columns.Where(c => !c.IsIdentity).ToList();
+
+        public List<DbColumn> PrimaryKeyColumns => Columns.Where(c => c.IsInPrimaryKey).ToList();
+
+        public bool HasPrimayKey => Columns.Any(c => c.IsInPrimaryKey);
+
+        public DbPrimaryKey PrimaryKey { get; set; } = new DbPrimaryKey();
+        public long RowCount { get; set; }
+        public string FileGroup { get; set; }
+        public int Partition { get; set; }
 
     }
 }

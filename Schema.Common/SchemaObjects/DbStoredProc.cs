@@ -4,14 +4,8 @@ namespace Schema.Common.SchemaObjects
 {
     public class DbStoredProc : DbSchemaObject
     {
-        public DbStoredProc()
-        {
-            SchemaObjectType = ESchemaObjectType.StoredProcedure;
-            Parameters = new ObservableCollection<DbParameter>();
-        }
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.StoredProcedure;
 
-
-
-        public ObservableCollection<DbParameter> Parameters { get; set; }
+        public ObservableCollection<DbParameter> Parameters { get; set; }=new ObservableCollection<DbParameter>();
     }
 }

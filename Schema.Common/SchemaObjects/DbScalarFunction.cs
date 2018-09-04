@@ -2,10 +2,8 @@
 {
     class DbScalarFunction : DbSchemaObject
     {
-        public DbScalarFunction()
-        {
-              SchemaObjectType = ESchemaObjectType.ScalarFunction;
-        }
-      
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.ScalarFunction;
     }
+
 }
+
