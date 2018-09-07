@@ -25,7 +25,7 @@ namespace PsSchema
             var schema = generator.GetSchema(connectionInfo);
 
             if (Output == "FullSchema")
-                WriteObject( schema);
+                WriteObject( schema,false);
             else if (Output == SchemaObject)
                 foreach (var dbSchemaObject  in schema)
                     WriteObject(dbSchemaObject);
