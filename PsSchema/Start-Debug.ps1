@@ -18,7 +18,15 @@ Import-Module 'PsSchema' -Verbose
 
 # Happy debugging :-)
 $constring = "Data Source=192.168.1.12;Initial Catalog=P;Persist Security Info=True;User ID=sa;Password=Iscandar2199"
+$constring = "Data Source=192.168.1.12;Initial Catalog=P;Persist Security Info=True;User ID=sa;Password=Iscandar2199"
 
-get-schema   -ConnectionString $constring |save-Schema  -Location D:\Dev\Dbs
+
+$constring = "Data Source=192.168.1.18;Initial Catalog=AdventureWorks2017;Persist Security Info=True;User ID=sa;Password=Iscandar2199"
+
+$schemaFromDb = get-schema   -ConnectionString $constring
+
+save-Schema   -Schema $schemaFromDb -Location D:\Dev\Dbs\AdventureWorks2017
+
+$schemaFromDir = get-schema  -Directory D:\Dev\Dbs\AdventureWorks2017
 
 

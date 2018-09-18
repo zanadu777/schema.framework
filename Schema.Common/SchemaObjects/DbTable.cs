@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using Errata.Collections;
 
 namespace Schema.Common.SchemaObjects
 {
@@ -14,6 +16,7 @@ namespace Schema.Common.SchemaObjects
         public DbTable()
         {
             Columns = new ObservableCollection<DbColumn>();
+          
         }
 
         public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.Table;
@@ -65,6 +68,19 @@ namespace Schema.Common.SchemaObjects
         public long RowCount { get; set; }
         public string FileGroup { get; set; }
         public int Partition { get; set; }
+
+        public  string GenerateDefinition()
+        {
+            var rl = Columns.ToRemainderLast();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Create Table {SchemaName}.{Name}");
+            sb.Append("(");
+            foreach (var col in rl.Remainder)
+                sb.AppendLine($"{col.Declaration},");
+            
+            sb.AppendLine($"{rl.Last.Declaration})");
+            return sb.ToString();
+        }
 
     }
 }

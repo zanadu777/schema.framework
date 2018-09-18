@@ -16,8 +16,8 @@ namespace Schema.Common.SchemaObjects
 
         public bool IsIdentity { get; set; }
 
-        public int IdentityStep { get; set; }
-        public int IdentitySeed { get; set; }
+        public long IdentityStep { get; set; }
+        public long IdentitySeed { get; set; }
 
         public bool IsNullable { get; set; }
 

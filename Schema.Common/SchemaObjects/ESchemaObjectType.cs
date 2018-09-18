@@ -6,6 +6,8 @@
         View,
         StoredProcedure,
         ScalarFunction,
+        TableFunction,
+        Triger, 
         PrimaryKey
     }
 }
