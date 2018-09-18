@@ -3,7 +3,7 @@
 namespace Schema.Common.SchemaObjects
 {
     [Serializable]
-    public class DbSchemaObject
+    public abstract class DbSchemaObject
     {
         public string Name { get; set; }
 
@@ -14,6 +14,6 @@ namespace Schema.Common.SchemaObjects
         /// </summary>
         public string Definition { get; set; }
 
-        public ESchemaObjectType SchemaObjectType { get; set; }
+        public abstract ESchemaObjectType SchemaObjectType { get; }
     }
 }

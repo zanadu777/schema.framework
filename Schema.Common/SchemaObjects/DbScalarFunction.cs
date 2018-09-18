@@ -1,11 +1,9 @@
 ﻿namespace Schema.Common.SchemaObjects
 {
-    class DbScalarFunction : DbSchemaObject
+  public  class DbScalarFunction : DbSchemaObject
     {
-        public DbScalarFunction()
-        {
-              SchemaObjectType = ESchemaObjectType.ScalarFunction;
-        }
-      
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.ScalarFunction;
     }
+
 }
+

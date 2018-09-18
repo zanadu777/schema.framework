@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Schema.Common.SchemaObjects
 {
@@ -7,7 +8,7 @@ namespace Schema.Common.SchemaObjects
     {
         public string Name { get; set; }
 
-        public string ParamName => "@"+ Name;
+        public string ParamName => "@" + Name;
         public string DataType { get; set; }
         public int Ordinal { get; set; }
 
@@ -15,8 +16,8 @@ namespace Schema.Common.SchemaObjects
 
         public bool IsIdentity { get; set; }
 
-        public int IdentityStep { get; set; }
-        public int IdentitySeed { get; set; }
+        public long IdentityStep { get; set; }
+        public long IdentitySeed { get; set; }
 
         public bool IsNullable { get; set; }
 
@@ -26,12 +27,71 @@ namespace Schema.Common.SchemaObjects
 
         public bool IsReferencedPrimaryKey { get; set; }
 
+        public int Precision { get; set; }
+        public int Scale { get; set; }
+
         public DbColumn() { }
 
+        public string DisplayDataType
+        {
+            get
+            {
+                var dbDataType = DataType;
+                switch (dbDataType)
+                {
+                    case "nvarchar":
+                    case "nchar":
+                        if (MaxLength == -1)
+                            dbDataType += "(MAX)";
+                        else
+                            dbDataType += "(" + MaxLength / 2 + ")";
+                        break;
+                    case "decimal":
+                    case "numeric":
+                        dbDataType += $"({Precision}, {Scale})";
+                        break;
+                    case "varchar":
+                    case "char":
+                    case "varbinary":
+                        if (MaxLength == -1)
+                            dbDataType += "(MAX)";
+                        else
+                            dbDataType += "(" + MaxLength + ")";
+                        break;
+                }
 
-        public string DisplayDataType { get; set; }
 
-        public EKeyStatus  KeyStatus
+                return dbDataType;
+            }
+        }
+
+        public string Declaration
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(Name);
+                sb.Append(" ");
+                sb.Append(DisplayDataType);
+                if (IsIdentity)
+                {
+                    sb.Append($" IDENTITY({IdentitySeed}, {IdentityStep})");
+                }
+                if (!IsNullable)
+                    sb.Append(" NOT NULL");
+
+
+                return sb.ToString();
+            }
+
+
+        }
+
+
+        public string ParameterDeclaration => $@"@{Name} {DisplayDataType}";
+
+
+        public EKeyStatus KeyStatus
         {
             get
             {

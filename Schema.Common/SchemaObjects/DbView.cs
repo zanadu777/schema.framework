@@ -2,13 +2,9 @@
 
 namespace Schema.Common.SchemaObjects
 {
-   public class DbView : DbSchemaObject
+    public class DbView : DbSchemaObject
     {
-        public DbView()
-        {
-            SchemaObjectType = ESchemaObjectType.View;
-            Columns = new ObservableCollection<DbColumn>();
-        }
-        public ObservableCollection<DbColumn> Columns { get; set; }
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.View;
+        public ObservableCollection<DbColumn> Columns { get; set; } = new ObservableCollection<DbColumn>();
     }
 }
