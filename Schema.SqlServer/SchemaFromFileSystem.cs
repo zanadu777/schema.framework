@@ -25,7 +25,7 @@ namespace Schema.SqlServer
             foreach (var file in files)
             {
                 var schemaObject = ParseSchemaObject(file);
-
+                schema.Add(schemaObject);
             }
 
 

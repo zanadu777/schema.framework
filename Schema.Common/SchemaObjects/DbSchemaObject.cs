@@ -9,6 +9,9 @@ namespace Schema.Common.SchemaObjects
 
         public string SchemaName { get; set; }
 
+        public string UniqueName => $"{SchemaName}.{Name}";
+     
+
         /// <summary>
         /// The SQl definition of the object
         /// </summary>

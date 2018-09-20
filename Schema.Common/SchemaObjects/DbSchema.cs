@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,37 +10,13 @@ namespace Schema.Common.SchemaObjects
     {
         public DbSchema()
         {
-            
+
         }
 
         public DbSchema(IEnumerable<DbSchemaObject> dbObjects)
         {
             foreach (var dbObject in dbObjects)
-            {
-                switch (dbObject.SchemaObjectType)
-                {
-                    case ESchemaObjectType.Table:
-                        Tables.Add((DbTable)dbObject);
-                        break;
-                    case ESchemaObjectType.View:
-                        Views.Add((DbView)dbObject);
-                        break;
-                    case ESchemaObjectType.StoredProcedure:
-                        StoredProcs.Add((DbStoredProc)dbObject);
-                        break;
-                    case ESchemaObjectType.ScalarFunction:
-                        ScalarFunctions.Add((DbScalarFunction)dbObject);
-                        break;
-                    case ESchemaObjectType.TableFunction:
-                        TableFunctions.Add((DbTableFunction)dbObject);
-                        break;
-                    case ESchemaObjectType.Triger:
-                        Triggers.Add((DbTrigger)dbObject);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+                Add(dbObject);
         }
         public ObservableCollection<DbScalarFunction> ScalarFunctions { get; set; } = new ObservableCollection<DbScalarFunction>();
         public ObservableCollection<DbTableFunction> TableFunctions { get; set; } = new ObservableCollection<DbTableFunction>();
@@ -88,6 +65,33 @@ namespace Schema.Common.SchemaObjects
 
             foreach (var item in Triggers)
                 yield return item;
+        }
+
+        public void Add(DbSchemaObject schemaObject)
+        {
+            switch (schemaObject.SchemaObjectType)
+            {
+                case ESchemaObjectType.Table:
+                    Tables.Add((DbTable)schemaObject);
+                    break;
+                case ESchemaObjectType.View:
+                    Views.Add((DbView)schemaObject);
+                    break;
+                case ESchemaObjectType.StoredProcedure:
+                    StoredProcs.Add((DbStoredProc)schemaObject);
+                    break;
+                case ESchemaObjectType.ScalarFunction:
+                    ScalarFunctions.Add((DbScalarFunction)schemaObject);
+                    break;
+                case ESchemaObjectType.TableFunction:
+                    TableFunctions.Add((DbTableFunction)schemaObject);
+                    break;
+                case ESchemaObjectType.Triger:
+                    Triggers.Add((DbTrigger)schemaObject);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

@@ -29,4 +29,4 @@ save-Schema   -Schema $schemaFromDb -Location D:\Dev\Dbs\AdventureWorks2017
 
 $schemaFromDir = get-schema  -Directory D:\Dev\Dbs\AdventureWorks2017
 
-
+ compare-Schema -SchemaA $schemaFromDb -SchemaB  $schemaFromDir
