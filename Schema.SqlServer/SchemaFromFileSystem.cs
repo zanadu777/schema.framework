@@ -57,10 +57,14 @@ namespace Schema.SqlServer
                 case ESchemaObjectType.TableFunction:
                     schemaObject = new DbTableFunction();
                     break;
-                case ESchemaObjectType.Triger:
+                case ESchemaObjectType.Trigger:
                     schemaObject = new DbTrigger();
                     break;
                 case ESchemaObjectType.PrimaryKey:
+                    schemaObject = new DbPrimaryKey();
+                    break;
+                case ESchemaObjectType.ForeignKey:
+                    schemaObject= new DbForeignKey();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -7,7 +7,8 @@
         StoredProcedure,
         ScalarFunction,
         TableFunction,
-        Triger, 
-        PrimaryKey
+        Trigger, 
+        PrimaryKey, 
+        ForeignKey
     }
 }

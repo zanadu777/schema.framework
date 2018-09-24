@@ -35,19 +35,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Errata.Collections, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Errata.Framework.0.0.0.2-PreRelease\lib\net472\Errata.Collections.dll</HintPath>
+      <HintPath>..\packages\Errata.Framework.0.0.0.3-PreRelease\lib\net472\Errata.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Errata.Collections.NUnit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Errata.Framework.0.0.0.2-PreRelease\lib\net472\Errata.Collections.NUnit.dll</HintPath>
+      <HintPath>..\packages\Errata.Framework.0.0.0.3-PreRelease\lib\net472\Errata.Collections.NUnit.dll</HintPath>
     </Reference>
     <Reference Include="Errata.Cryptography, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Errata.Framework.0.0.0.2-PreRelease\lib\net472\Errata.Cryptography.dll</HintPath>
+      <HintPath>..\packages\Errata.Framework.0.0.0.3-PreRelease\lib\net472\Errata.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="Errata.IO, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Errata.Framework.0.0.0.2-PreRelease\lib\net472\Errata.IO.dll</HintPath>
+      <HintPath>..\packages\Errata.Framework.0.0.0.3-PreRelease\lib\net472\Errata.IO.dll</HintPath>
     </Reference>
     <Reference Include="Errata.Text, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Errata.Framework.0.0.0.2-PreRelease\lib\net472\Errata.Text.dll</HintPath>
+      <HintPath>..\packages\Errata.Framework.0.0.0.3-PreRelease\lib\net472\Errata.Text.dll</HintPath>
     </Reference>
     <Reference Include="FluentAssertions, Version=5.4.1.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.5.4.1\lib\net47\FluentAssertions.dll</HintPath>
@@ -79,7 +79,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

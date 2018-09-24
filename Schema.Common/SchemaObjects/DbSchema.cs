@@ -25,6 +25,8 @@ namespace Schema.Common.SchemaObjects
         public ObservableCollection<DbTable> Tables { get; set; } = new ObservableCollection<DbTable>();
         public ObservableCollection<DbView> Views { get; set; } = new ObservableCollection<DbView>();
         public ObservableCollection<DbStoredProc> StoredProcs { get; set; } = new ObservableCollection<DbStoredProc>();
+
+        public ObservableCollection<DbForeignKey> ForeignKeys { get; set; } = new ObservableCollection<DbForeignKey>();
         public IEnumerator<DbSchemaObject> GetEnumerator()
         {
             foreach (var item in Tables)
@@ -43,6 +45,9 @@ namespace Schema.Common.SchemaObjects
                 yield return item;
 
             foreach (var item in Triggers)
+                yield return item;
+
+            foreach (var item in ForeignKeys)
                 yield return item;
         }
 
@@ -65,6 +70,9 @@ namespace Schema.Common.SchemaObjects
 
             foreach (var item in Triggers)
                 yield return item;
+
+            foreach (var item in ForeignKeys)
+                yield return item;
         }
 
         public void Add(DbSchemaObject schemaObject)
@@ -86,8 +94,11 @@ namespace Schema.Common.SchemaObjects
                 case ESchemaObjectType.TableFunction:
                     TableFunctions.Add((DbTableFunction)schemaObject);
                     break;
-                case ESchemaObjectType.Triger:
+                case ESchemaObjectType.Trigger:
                     Triggers.Add((DbTrigger)schemaObject);
+                    break;
+                case ESchemaObjectType.ForeignKey:
+                    ForeignKeys.Add((DbForeignKey)schemaObject);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

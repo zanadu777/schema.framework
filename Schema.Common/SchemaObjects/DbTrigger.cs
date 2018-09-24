@@ -8,6 +8,6 @@ namespace Schema.Common.SchemaObjects
 {
     public class DbTrigger:DbSchemaObject
     {
-        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.Triger;
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.Trigger;
     }
 }

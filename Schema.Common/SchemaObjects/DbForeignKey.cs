@@ -7,9 +7,10 @@ namespace Schema.Common.SchemaObjects
 {
     [DebuggerVisualizer(typeof(DbForeignKey))]
     [Serializable]
-    public  class DbForeignKey
+    public  class DbForeignKey:DbSchemaObject
     {
-      public DbForeignKey()
+        public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.ForeignKey;
+        public DbForeignKey()
       {
           Columns = new List<DbForeignKeyColumn>();
       }

@@ -16,7 +16,7 @@ namespace Schema.Common.SchemaObjects
         public DbTable()
         {
             Columns = new ObservableCollection<DbColumn>();
-          
+
         }
 
         public override ESchemaObjectType SchemaObjectType => ESchemaObjectType.Table;
@@ -59,7 +59,7 @@ namespace Schema.Common.SchemaObjects
 
         public List<DbColumn> PrimaryKeyColumns => Columns.Where(c => c.IsInPrimaryKey).ToList();
 
-        public List<DbForeignKey>ForeignKeyConstraints = new List<DbForeignKey>();
+        public List<DbForeignKey> ForeignKeyConstraints = new List<DbForeignKey>();
         public List<DbForeignKey> ForeignKeyReferences = new List<DbForeignKey>();
 
         public bool HasPrimayKey => Columns.Any(c => c.IsInPrimaryKey);
@@ -69,17 +69,30 @@ namespace Schema.Common.SchemaObjects
         public string FileGroup { get; set; }
         public int Partition { get; set; }
 
-        public  string GenerateDefinition()
+        public string GenerateDefinition()
         {
             var rl = Columns.ToRemainderLast();
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Create Table {SchemaName}.{Name}");
-            sb.Append("(");
+            CodeBuilder cb = new CodeBuilder();
+            cb.IndentLength = 4;
+            cb.AppendLine($"Create Table {SchemaName}.{Name}");
+            cb.Indent();
+            cb.AppendLine("(");
             foreach (var col in rl.Remainder)
-                sb.AppendLine($"{col.Declaration},");
-            
-            sb.AppendLine($"{rl.Last.Declaration})");
-            return sb.ToString();
+                cb.AppendLine($"{col.Declaration},");
+
+            cb.AppendLine($"{rl.Last.Declaration}{((HasPrimayKey) ? "," : "")}");
+
+            if (HasPrimayKey)
+            {
+                cb.AppendLine($"CONSTRAINT {PrimaryKey.Name} PRIMARY KEY {PrimaryKey.Type}");
+                cb.Indent();
+                cb.StartLine("(").AppendDelimited(",", PrimaryKeyColumns, c=> c.Name).EndLine(")");
+                cb.Outdent();
+            }
+
+            cb.Outdent();
+            cb.AppendLine(")");
+            return cb.ToString();
         }
 
     }

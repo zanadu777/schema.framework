@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using Schema.Common;
 using Schema.Common.Connectivity;
 using Schema.Common.Interfaces;
 using Schema.Common.SchemaObjects;
@@ -24,13 +25,96 @@ namespace Schema.SqlServer
                 dbObjects.Add(dbObject);
 
             var modules = GetModules(connectionInfo);
-            foreach (var dbObject in modules )
+            foreach (var dbObject in modules)
+                dbObjects.Add(dbObject);
+
+            var fkeys = GetForeignKeys(connectionInfo);
+            foreach (var dbObject in fkeys )
                 dbObjects.Add(dbObject);
 
             var schema = new DbSchema(dbObjects);
             return schema;
         }
 
+
+        private List<  DbForeignKey> GetForeignKeys(DatabaseConnectionInfo connectionInfo)
+        {
+            var fKeys = new Dictionary<string, DbForeignKey>();
+
+            var sql = @"select	SCHEMA_NAME(sof.schema_id) + '.' + sof.name as ConstraintName ,
+        SCHEMA_NAME(sof.schema_id) as SchemaName ,
+		sof.name,
+		SCHEMA_NAME(sop.schema_id) + '.' + sop.name as ForeignKeyTable, 
+		SCHEMA_NAME(sor.schema_id) + '.' +sor.name  as PrimaryKeyTable, 
+		scp.name as ForeignKeyColumn, 
+		scf.name as PrimaryKeyColumn
+from sys.foreign_key_columns  fk
+
+inner join Sys.objects sop on fk.parent_object_id = sop.object_id
+inner join Sys.objects sof on fk.constraint_object_id = sof.object_id
+inner join Sys.objects sor on fk.referenced_object_id = sor.object_id
+inner join Sys.Columns scp on fk.parent_column_id = scp.column_id and fk.parent_object_id = scp.object_id
+inner join Sys.Columns scf on fk.referenced_column_id = scf.column_id and fk.referenced_object_id = scf.object_id";
+            var primaryKeys = new Dictionary<string, List<string>>();
+
+            using (var conn = new SqlConnection(connectionInfo.ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = sql;
+                    var reader = cmd.ExecuteReader();
+                    var constraintNamePos = reader.GetOrdinal("ConstraintName");
+                    var schemaNamePos = reader.GetOrdinal("SchemaName");
+                    var namePos = reader.GetOrdinal("name");
+                    var foreignKeyTablePos = reader.GetOrdinal("ForeignKeyTable");
+                    var primaryKeyTablePos = reader.GetOrdinal("PrimaryKeyTable");
+                    var foreignKeyColumnPos = reader.GetOrdinal("ForeignKeyColumn");
+                    var primaryKeyColumnPos = reader.GetOrdinal("PrimaryKeyColumn");
+                    while (reader.Read())
+                    {
+                        var constraintName = reader.GetString(constraintNamePos);
+                        DbForeignKey fKey;
+                        if (!fKeys.ContainsKey(constraintName))
+                        {
+                            fKey = new DbForeignKey
+                            {
+                                ConstraintFullName = constraintName,
+                                Name = reader.GetString(namePos),
+                                SchemaName= reader.GetString( schemaNamePos),
+                                ForeignKeyTable = reader.GetString(foreignKeyTablePos),
+                                PrimaryKeyTable = reader.GetString(primaryKeyTablePos)
+                            };
+                            fKeys.Add(constraintName, fKey);
+                        }
+                        fKeys[constraintName].Columns.Add(new DbForeignKeyColumn
+                        {
+                            PrimaryKeyColumn = reader.GetString(primaryKeyColumnPos),
+                            ForeignKeyColumn = reader.GetString(foreignKeyColumnPos),
+                        });
+                    }
+                }
+            }
+            Dictionary<string, DbForeignKey>.ValueCollection fkList = fKeys.Values;
+
+
+            foreach (var key in  fkList)
+            {
+                CodeBuilder cb = new CodeBuilder();
+                cb.AppendLine($"alter table {key.ForeignKeyTable}");
+                cb.Indent();
+                cb.AppendLine($"Add constraint {key.Name}");
+                cb.StartLine("foreign key(");
+                cb.AppendDelimited(", ", key.Columns, c => c.ForeignKeyColumn);
+                cb.Append($") references {key.PrimaryKeyTable}(");
+                cb.AppendDelimited(", ", key.Columns, c => c.PrimaryKeyColumn);
+                cb.EndLine(")");
+                key.Definition = cb.ToString();
+            }
+
+            return fkList.ToList();
+        }
 
         public List<DbSchemaObject> GetModules(DatabaseConnectionInfo connectionInfo)
         {
@@ -87,13 +171,13 @@ from sys.objects p inner join
             }
         }
 
-        private  static DbSchemaObject NewObjectOfType(string sqlServerType)
+        private static DbSchemaObject NewObjectOfType(string sqlServerType)
         {
 
             switch (sqlServerType)
             {
                 case "V":
-                  return new DbView();
+                    return new DbView();
                     break;
                 case "P":
                     return new DbStoredProc();
