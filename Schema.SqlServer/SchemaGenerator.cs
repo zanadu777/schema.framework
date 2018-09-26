@@ -161,7 +161,7 @@ from sys.objects p inner join
                         DbSchemaObject dbObject = NewObjectOfType(sqlServerType);
                         dbObject.Name = reader.GetString(namePos);
                         dbObject.SchemaName = reader.GetString(schemaNamePos);
-                        dbObject.Definition = reader.GetString(definitionPos);
+                        dbObject.Definition = reader.GetString(definitionPos).Trim();
 
                         objects.Add(dbObject);
                     }
