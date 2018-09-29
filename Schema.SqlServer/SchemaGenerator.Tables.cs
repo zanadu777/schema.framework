@@ -46,15 +46,15 @@ where type in ('U')"
 			{
 				CommandType = CommandType.Text,
 				CommandText =
-					@"select SCHEMA_NAME(so.schema_id) + '.'+ so.name as fullTableName ,c.name as columnName,c.column_id as ordinal, c.is_nullable ,
+                    @"select SCHEMA_NAME(so.schema_id) + '.'+ so.name as fullTableName ,c.name as columnName,c.column_id as ordinal, c.is_nullable ,
    c.is_identity, ISNULL(i.seed_value,0) as Seed, ISNULL(i.increment_value,0)  as Step,
-   c.is_computed  ,TYPE_NAME(c.system_type_id) as datatype,c.max_length, c.precision
+   c.is_computed  ,TYPE_NAME(c.system_type_id) as datatype,c.max_length, c.precision, c.scale
   from sys.columns c 
  inner join sys.objects so on so.object_id = c.object_id
  left outer Join sys.identity_columns i  on c.object_id = i.object_id
  where so.type in ('U') 
  order by so.object_id, c.column_id"
-			};
+            };
 
 			return cmd;
 		}
@@ -151,7 +151,9 @@ FROM
 					var datatypePos = reader.GetOrdinal("datatype");
 					var max_lengthPos = reader.GetOrdinal("max_length");
 					var ordinalPos = reader.GetOrdinal("ordinal");
-					while (reader.Read())
+				    var precisionPos = reader.GetOrdinal("precision");
+				    var scalePos = reader.GetOrdinal("scale");
+                    while (reader.Read())
 					{
 						var fullTableName = reader.GetString(fullTableNamePos);
 						var table = tables[fullTableName];
@@ -168,8 +170,9 @@ FROM
 							col.IdentityStep = Convert.ToInt64(reader.GetValue(stepPos));
 							col.MaxLength = (Int16)reader.GetValue(max_lengthPos);
 							col.Ordinal = reader.GetInt32(ordinalPos);
-
-							table.Columns.Add(col);
+						    col.Precision = reader.GetByte(precisionPos);
+                            col.Scale = reader.GetByte(scalePos);
+                            table.Columns.Add(col);
 						}
 						catch (Exception ex)
 						{
