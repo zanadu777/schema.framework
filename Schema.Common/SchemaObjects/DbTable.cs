@@ -92,7 +92,7 @@ namespace Schema.Common.SchemaObjects
 
             cb.Outdent();
             cb.AppendLine(")");
-            return cb.ToString();
+            return cb.ToString().Trim();
         }
 
     }
