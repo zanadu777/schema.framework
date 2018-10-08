@@ -9,6 +9,7 @@
         TableFunction,
         Trigger, 
         PrimaryKey, 
-        ForeignKey
+        ForeignKey, 
+        Index
     }
 }

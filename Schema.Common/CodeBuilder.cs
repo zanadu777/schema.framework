@@ -108,5 +108,30 @@ namespace Schema.Common
             return this;
         }
 
+        public CodeBuilder AppendLineDelimited(string delimiter, IEnumerable<string> strings)
+        {
+            if (strings == null)
+                return this;
+
+            var stringList = strings.ToList();
+
+            if (stringList.Count == 1)
+            {
+                AppendLine(stringList[0]);
+                return this;
+            }
+
+            for (var i = 0; i < stringList.Count - 1; i++ )
+                AppendLine($"{stringList[i]}{delimiter}");
+
+            AppendLine(stringList.Last());
+            return this;
+        }
+
+        public CodeBuilder AppendLineDelimited<T>(string delimiter, IEnumerable<T> items, Func<T, String> expression)
+        {
+            var strings = items.Select(expression);
+            return AppendLineDelimited(delimiter, strings);
+        }
     }
 }

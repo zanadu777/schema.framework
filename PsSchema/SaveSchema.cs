@@ -18,7 +18,12 @@ namespace PsSchema
         {
             var dir = new DirectoryInfo(Location);
             foreach (var schemaObject in Schema)
-                dir.WriteAllText($"{schemaObject.SchemaObjectType}_{schemaObject.SchemaName.Replace(@"\", "-")}.{schemaObject.Name}.sql" , schemaObject.Definition.Trim());
+            {
+                if (schemaObject.SchemaObjectType == ESchemaObjectType.Index)
+                    dir.WriteAllText($"{schemaObject.SchemaObjectType}_{schemaObject.Name}.sql", schemaObject.Definition.Trim());
+                else
+                    dir.WriteAllText($"{schemaObject.SchemaObjectType}_{schemaObject.SchemaName.Replace(@"\", "-")}.{schemaObject.Name}.sql" , schemaObject.Definition.Trim());
+            }
         }
     }
 }

@@ -27,6 +27,8 @@ namespace Schema.Common.SchemaObjects
         public ObservableCollection<DbStoredProc> StoredProcs { get; set; } = new ObservableCollection<DbStoredProc>();
 
         public ObservableCollection<DbForeignKey> ForeignKeys { get; set; } = new ObservableCollection<DbForeignKey>();
+
+        public ObservableCollection<DbIndex> Indexes { get; set; } = new ObservableCollection<DbIndex>();
         public IEnumerator<DbSchemaObject> GetEnumerator()
         {
             foreach (var item in Tables)
@@ -48,6 +50,9 @@ namespace Schema.Common.SchemaObjects
                 yield return item;
 
             foreach (var item in ForeignKeys)
+                yield return item;
+
+            foreach (var item in Indexes)
                 yield return item;
         }
 
@@ -72,6 +77,9 @@ namespace Schema.Common.SchemaObjects
                 yield return item;
 
             foreach (var item in ForeignKeys)
+                yield return item;
+
+            foreach (var item in Indexes)
                 yield return item;
         }
 
@@ -99,6 +107,9 @@ namespace Schema.Common.SchemaObjects
                     break;
                 case ESchemaObjectType.ForeignKey:
                     ForeignKeys.Add((DbForeignKey)schemaObject);
+                    break;
+                case ESchemaObjectType.Index:
+                    Indexes.Add((DbIndex)schemaObject);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

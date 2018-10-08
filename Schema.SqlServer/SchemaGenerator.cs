@@ -29,7 +29,11 @@ namespace Schema.SqlServer
                 dbObjects.Add(dbObject);
 
             var fkeys = GetForeignKeys(connectionInfo);
-            foreach (var dbObject in fkeys )
+            foreach (var dbObject in fkeys)
+                dbObjects.Add(dbObject);
+
+            var indexes = GetIndexes(connectionInfo);
+            foreach (var dbObject in indexes)
                 dbObjects.Add(dbObject);
 
             var schema = new DbSchema(dbObjects);
@@ -37,12 +41,12 @@ namespace Schema.SqlServer
         }
 
 
-        private List<  DbForeignKey> GetForeignKeys(DatabaseConnectionInfo connectionInfo)
+        private List<DbForeignKey> GetForeignKeys(DatabaseConnectionInfo connectionInfo)
         {
             var fKeys = new Dictionary<string, DbForeignKey>();
 
             var sql = @"select	SCHEMA_NAME(sof.schema_id) + '.' + sof.name as ConstraintName ,
-        SCHEMA_NAME(sof.schema_id) as SchemaName ,
+		SCHEMA_NAME(sof.schema_id) as SchemaName ,
 		sof.name,
 		SCHEMA_NAME(sop.schema_id) + '.' + sop.name as ForeignKeyTable, 
 		SCHEMA_NAME(sor.schema_id) + '.' +sor.name  as PrimaryKeyTable, 
@@ -82,7 +86,7 @@ inner join Sys.Columns scf on fk.referenced_column_id = scf.column_id and fk.ref
                             {
                                 ConstraintFullName = constraintName,
                                 Name = reader.GetString(namePos),
-                                SchemaName= reader.GetString( schemaNamePos),
+                                SchemaName = reader.GetString(schemaNamePos),
                                 ForeignKeyTable = reader.GetString(foreignKeyTablePos),
                                 PrimaryKeyTable = reader.GetString(primaryKeyTablePos)
                             };
@@ -99,7 +103,7 @@ inner join Sys.Columns scf on fk.referenced_column_id = scf.column_id and fk.ref
             Dictionary<string, DbForeignKey>.ValueCollection fkList = fKeys.Values;
 
 
-            foreach (var key in  fkList)
+            foreach (var key in fkList)
             {
                 CodeBuilder cb = new CodeBuilder();
                 cb.AppendLine($"alter table {key.ForeignKeyTable}");
@@ -198,7 +202,86 @@ from sys.objects p inner join
                     throw new Exception($"Object of type {sqlServerType} encountered");
                     break;
             }
+        }
 
+        public List<DbSchemaObject> GetIndexes(DatabaseConnectionInfo connectionInfo)
+        {
+            Dictionary<string, DbIndex> indexes = new Dictionary<string, DbIndex>();
+            using (SqlConnection conn = new SqlConnection(connectionInfo.ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = @"SELECT 
+     TableName = t.name,
+	 TableSchema = SCHEMA_NAME(t.schema_id),
+	 TableFullName = SCHEMA_NAME(t.schema_id) + '.' + t.name,
+     IndexName = ind.name,
+     IndexType = ind.type_desc,
+     IsUnique = ind.is_unique_constraint,
+     IndexId = ind.index_id,
+     ColumnId = ic.index_column_id,
+     ColumnName = col.name,
+     IsDescending = ic.is_descending_key,
+     ind.*,
+     ic.*,
+     col.* 
+FROM 
+     sys.indexes ind 
+INNER JOIN 
+     sys.index_columns ic ON  ind.object_id = ic.object_id and ind.index_id = ic.index_id 
+INNER JOIN 
+     sys.columns col ON ic.object_id = col.object_id and ic.column_id = col.column_id 
+INNER JOIN 
+     sys.tables t ON ind.object_id = t.object_id 
+WHERE 
+     ind.is_primary_key = 0 
+     AND ind.is_unique = 0 
+     AND ind.is_unique_constraint = 0 
+     AND t.is_ms_shipped = 0 
+ORDER BY 
+     t.name, ind.name, ind.index_id, ic.index_column_id;";
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var tableNamePos = reader.GetOrdinal("TableFullName");
+                        var indexNamePos = reader.GetOrdinal("IndexName");
+                        var indexTypePos = reader.GetOrdinal("IndexType");
+                        var isUniquePos = reader.GetOrdinal("IsUnique");
+                        var columnNamePos = reader.GetOrdinal("ColumnName");
+                        var columnIdPos = reader.GetOrdinal("ColumnId");
+                        var isDescendingPos = reader.GetOrdinal("IsDescending");
+                        while (reader.Read())
+                        {
+                            var name = reader.GetString(indexNamePos);
+                            if (!indexes.ContainsKey(name))
+                            {
+                                var index = new DbIndex();
+                                index.Name = name;
+                                index.TableFullName = reader.GetString(tableNamePos);
+                                index.IndexType = reader.GetString(indexTypePos);
+                                index.IsUnique = reader.GetBoolean(isUniquePos);
+                                indexes.Add(name, index);
+                            }
+
+                            var column = new DbIndexColumn();
+                            column.Name = reader.GetString(columnNamePos);
+                            column.Ordinal = reader.GetInt32(columnIdPos);
+                            column.IsDescending = reader.GetBoolean(isDescendingPos);
+                            indexes[name].Columns.Add(column);
+                        }
+                    }
+
+                }
+
+            }
+
+            foreach (var index in  indexes.Values)
+                index.Definition = index.GenerateDefinition();
+
+            return (from DbSchemaObject obj in indexes.Values
+                    select obj).ToList();
         }
 
         public Dictionary<string, DbView> GetViews(DatabaseConnectionInfo connectionInfo)
@@ -269,7 +352,5 @@ from sys.objects p inner join
         {
             throw new NotImplementedException();
         }
-
-
     }
 }
