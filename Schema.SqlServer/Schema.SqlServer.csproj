@@ -68,6 +68,8 @@
     <Compile Include="SchemaGenerator.Tables.cs">
       <DependentUpon>SchemaGenerator.cs</DependentUpon>
     </Compile>
+    <Compile Include="SqlGenerator.cs" />
+    <Compile Include="SqlReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Schema.Common\Schema.Common.csproj">

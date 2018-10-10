@@ -17,8 +17,10 @@ namespace Schema.Common.SchemaObjects
 
         public string GenerateDefinition()
         {
+            var unique = (IsUnique) ? "UNIQUE " : "";
+
             var cb = new CodeBuilder();
-            cb.AppendLine($"Create {IndexType} INDEX {Name} ON {TableFullName}");
+            cb.AppendLine($"Create {unique}{IndexType} INDEX {Name} ON {TableFullName}");
             cb.AppendLine("(");
             cb.Indent();
             cb.AppendLineDelimited(",", Columns, c => $"{c.Name} {Direction(c.IsDescending)}");   

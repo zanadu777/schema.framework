@@ -236,9 +236,7 @@ INNER JOIN
 INNER JOIN 
      sys.tables t ON ind.object_id = t.object_id 
 WHERE 
-     ind.is_primary_key = 0 
-     AND ind.is_unique = 0 
-     AND ind.is_unique_constraint = 0 
+     ind.is_primary_key = 0
      AND t.is_ms_shipped = 0 
 ORDER BY 
      t.name, ind.name, ind.index_id, ic.index_column_id;";

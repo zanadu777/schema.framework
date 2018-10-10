@@ -39,7 +39,7 @@ namespace PsSchema
             else if (this.ParameterSetName == "fromDirectory")
             {
                 var generator = new SchemaFromFileSystem();
-                schema = generator.GetSchem(new DirectoryInfo(Directory));
+                schema = generator.GetSchema(new DirectoryInfo(Directory));
             }
 
             if (schema == null)

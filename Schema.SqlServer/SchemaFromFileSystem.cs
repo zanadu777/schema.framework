@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -11,15 +12,16 @@ using Schema.Common.SchemaObjects;
 
 namespace Schema.SqlServer
 {
-   public   class SchemaFromFileSystem
+    public class SchemaFromFileSystem
     {
-        public DbSchema GetSchem(DirectoryInfo directory)
+       
+        public DbSchema GetSchema(DirectoryInfo directory)
         {
             var files = directory.GetFiles();
-            return GetSchem(files);
+            return GetSchema(files);
         }
 
-        public DbSchema GetSchem(IEnumerable<FileInfo> files)
+        public DbSchema GetSchema(IEnumerable<FileInfo> files)
         {
             var schema = new DbSchema();
             foreach (var file in files)
@@ -37,9 +39,9 @@ namespace Schema.SqlServer
         {
             DbSchemaObject schemaObject = null;
             var name = System.IO.Path.GetFileNameWithoutExtension(file.FullName);
-            var nameparts = name.Split('_');
+            var objectTypeName = name.Substring(0, name.IndexOf('_'));
 
-            var objectType = (ESchemaObjectType)Enum.Parse(typeof(ESchemaObjectType) ,  nameparts[0]) ;
+            var objectType = (ESchemaObjectType)Enum.Parse(typeof(ESchemaObjectType), objectTypeName);
             switch (objectType)
             {
                 case ESchemaObjectType.Table:
@@ -64,7 +66,10 @@ namespace Schema.SqlServer
                     schemaObject = new DbPrimaryKey();
                     break;
                 case ESchemaObjectType.ForeignKey:
-                    schemaObject= new DbForeignKey();
+                    schemaObject = new DbForeignKey();
+                    break;
+                case ESchemaObjectType.Index:
+                    schemaObject = new DbIndex();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -73,13 +78,8 @@ namespace Schema.SqlServer
             if (schemaObject == null)
                 throw new Exception("Unable to identify object");
 
-            var objectParts = nameparts[1].Split('.');
-            if (objectParts.Length != 2)
-                throw new Exception($"Problem with name {nameparts[1]}");
-
-            schemaObject.SchemaName = objectParts[0];
-            schemaObject.Name = objectParts[1];
             schemaObject.Definition = file.ReadAllText();
+           (schemaObject.SchemaName , schemaObject.Name) =  SqlReader.ReadNames(objectType, schemaObject.Definition);
 
             return schemaObject;
         }
